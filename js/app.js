@@ -8,23 +8,30 @@ const recovered=document.querySelector('.recovered');
 const chart=document.querySelector('.chart');
 
 let dataChart=[ ];
-const API_URL= "https://api.covid19api.com/summary";
+const API_URL_GLOBAL= "https://api.coronatracker.com/v3/stats/worldometer/global";
+const API_URL_COUNTRY = "https://api.coronatracker.com/v3/stats/worldometer/country";
 async function covid(country){
     countries.innerHTML='<option value="World">World</option>';
     resetValue(confirmed);
     resetValue(deaths);
     resetValue(recovered);
-    const res= await fetch(API_URL);
+    const res1= await fetch(API_URL_GLOBAL);
+    const res2= await fetch(API_URL_COUNTRY);
+
     //console.log(res);
-    const data= await res.json();
+    const data1= await res1.json();
+    const data2= await res2.json();
+
     console.log(country);
 
-    if(res.status === 4 || res.status === 200){
-        date.textContent= new Date(data.Date).toDateString();
+    if(res1.status === 4 || res1.status === 200){
+        date.textContent= new Date(data1.created).toDateString();
         if(country === '' || country === 'World'){
-            const {TotalConfirmed,TotalDeaths,TotalRecovered,NewConfirmed,NewDeaths,NewRecovered} = data.Global;
-            total(TotalConfirmed,TotalDeaths,TotalRecovered);
-            newUpdate(NewConfirmed,NewDeaths,NewRecovered);
+            const {totalConfirmed,totalDeaths,totalRecovered,totalNewCases,totalNewDeaths,totalActiveCases} = data1;
+            total(totalConfirmed,totalDeaths,totalRecovered);
+            newUpdate(totalNewCases,totalNewDeaths,totalActiveCases);
+
+            console.log(data1);
             
             // //Total Confirmed
             // confirmed.children[1].textContent=TotalConfirmed ;
@@ -39,20 +46,18 @@ async function covid(country){
             // recovered.children[1].textContent=TotalRecovered ;
             // recovered.children[2].textContent=NewRecovered ;
             nameCountry.textContent='The World';
-            dataChart=[TotalConfirmed,TotalDeaths,TotalRecovered];
+            dataChart=[totalConfirmed,totalDeaths,totalRecovered];
 
         };
         
-       
-
-        data.Countries.forEach(item=>{
+        data2.forEach(item=>{
             const option = document.createElement('option');
-            option.value = item.Country;
-            option.textContent = item.Country;
+            option.value = item.country;
+            option.textContent = item.country;
             countries.appendChild(option);
-            if(country === item.Country){
-                total(item.TotalConfirmed,item.TotalDeaths,item.TotalRecovered);
-                newUpdate(item.NewConfirmed,item.NewDeaths,item.NewRecovered);
+            if(country === item.country){
+                total(item.totalConfirmed,item.totalDeaths,item.totalRecovered);
+                newUpdate(item.totalConfirmedPerMillionPopulation,item.totalDeathsPerMillionPopulation,item.activeCases);
                 // confirmed.children[1].textContent=item.TotalConfirmed ;
                 // confirmed.children[2].textContent=item.NewConfirmed ;
                 // //Total Deaths
@@ -60,13 +65,16 @@ async function covid(country){
                 // deaths.children[1].textContent=item.TotalDeaths ;
                 // deaths.children[2].textContent=item.NewDeaths ;
         
-                // //Total Recovered
+                // //Total Recovereds
         
                 // recovered.children[1].textContent=item.TotalRecovered ;
                 // recovered.children[2].textContent=item.NewRecovered ;
 
                 nameCountry.textContent=item.Country;
-                dataChart=[item.TotalConfirmed,item.TotalDeaths,item.TotalRecovered];
+                dataChart=[item.totalConfirmed,item.totalDeaths,item.totalRecovered];
+
+                console.log(item);
+         
             }
         });
         drawChart(dataChart);
