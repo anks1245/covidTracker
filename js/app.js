@@ -31,7 +31,7 @@ async function covid(country){
             total(totalConfirmed,totalDeaths,totalRecovered);
             newUpdate(totalNewCases,totalNewDeaths,totalActiveCases);
 
-            console.log(data1);
+            // console.log(data1);
             
             // //Total Confirmed
             // confirmed.children[1].textContent=TotalConfirmed ;
@@ -73,7 +73,7 @@ async function covid(country){
                 nameCountry.textContent=item.Country;
                 dataChart=[item.totalConfirmed,item.totalDeaths,item.totalRecovered];
 
-                console.log(item);
+                // console.log(item);
          
             }
         });
